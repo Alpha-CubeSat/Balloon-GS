@@ -8,7 +8,7 @@ from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from werkzeug.security import check_password_hash
 
 from api.errors import error_response
-#from api.schemas import TokenResponseSchema
+from api.schemas import TokenResponseSchema
 from api.users_db import get_db
 
 auth = Blueprint('auth', __name__)
@@ -18,8 +18,7 @@ token_auth = HTTPTokenAuth()
 
 @basic_auth.verify_password
 def verify_password(username, password):
-    query = get_db().execute('SELECT id, password_hash FROM user WHERE username = ?',
-                               (username,)).fetchone()
+    query = get_db().execute('SELECT id, password_hash FROM user WHERE username = ?',(username,)).fetchone()
     if query:
         id, pw_hash = query
         if check_password_hash(pw_hash, password):
@@ -51,9 +50,8 @@ def token_auth_error(status):
 
 @auth.post('/token')
 @authenticate(basic_auth)
-#@response(TokenResponseSchema)
+@response(TokenResponseSchema)
 @other_responses({401: 'Invalid username or password'})
-
 def get_token():
     """
     Create Access Token
